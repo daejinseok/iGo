@@ -18,6 +18,7 @@ namespace igo
     public partial class FormIGo : Form
     {
         Dictionary<string, string> dic = new Dictionary<string, string>();
+        Dictionary<string, string> cfg = new Dictionary<string, string>();
 
         int hotKeyId = 0;
         int textBoxOldTextLen = 0;
@@ -44,14 +45,14 @@ namespace igo
 
             Debug.WriteLine("FormIGo");
 
-            if (!Register_HotKey())
-            {
-                MessageBox.Show("HotKey 등록 오류");
-                Application.Exit();
-                return;
-            }
+            //if (!Register_HotKey())
+            //{
+            //    MessageBox.Show("HotKey 등록 오류");
+            //    Application.Exit();
+            //    return;
+            //}
 
-            Trace.Assert(Load_iGo());
+            Trace.Assert(Load_iGos());
 
         }
 
@@ -77,13 +78,13 @@ namespace igo
         }
 
 
-        bool Load_iGo()
+        bool Load_iGos()
         {
 
             string[] igo_files = Directory.GetFiles(System.Environment.CurrentDirectory, "*.igo");
             List<string> igo_list = new List<string>();
 
-            Boolean bigo = false;
+            string igo_igo = "";
             Boolean bcmd = false;
             foreach (string igo_file in igo_files)
             {
@@ -91,31 +92,27 @@ namespace igo
 
                 if (igo_file.EndsWith("igo.igo"))
                 {
-                    bigo = true;
+                    igo_igo = igo_file;
                     continue;
                 }
 
                 if (igo_file.EndsWith("igo_cmd.igo"))
                 {
                     bcmd = true;
-                    igo_list.Add(igo_file);
-                    continue;
                 }
 
                 igo_list.Add(igo_file);
             }
 
-            Trace.Assert(bigo, "igo.igo file not found");
+            Trace.Assert(igo_igo.Length > 0, "igo.igo file not found");
             Trace.Assert(bcmd, "igo_cmd.igo file not found");
 
-            dic.Clear();
-            //dic.Add("/Quit", "");
-            //dic.Add("/ReLoad", "");
+            Load_igo_igo(igo_igo);
 
+            dic.Clear();
             foreach(string file_path in igo_list) {
                 Load_iGo_Cmd(ref dic, file_path);
             }
-
 
             return true;
         }
@@ -156,7 +153,8 @@ namespace igo
 
         private bool Register_HotKey()
         {
-            // Register Shift + A as global hotkey. 
+            // Register Shift + A as global hotkey.
+            UnregisterHotKey(this.Handle, hotKeyId);
             return RegisterHotKey(this.Handle, hotKeyId, (int)KeyModifier.Shift, Keys.A.GetHashCode());
             //return RegisterHotKey(this.Handle, hotKeyId, (int)KeyModifier.Alt, Keys.OemSemicolon.GetHashCode());
         }
@@ -318,7 +316,7 @@ namespace igo
                         Close();
                         break;
                     case "/ReLoad":
-                        reload();
+                        Trace.Assert(Load_iGos());
                         break;
                 }
             }
@@ -349,10 +347,80 @@ namespace igo
             this.Visible = !this.Visible;
         }
 
-        Boolean reload()
+        private void Load_igo_igo(string file_path)
         {
+            cfg.Clear();
+            string[] lines = System.IO.File.ReadAllLines(file_path);
 
-            return true;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i][0] == ';' | lines[i][0] == '#')
+                {
+                    continue;
+                }
+                string[] fa = lines[i].Split('=');
+
+                if (fa.Length > 1)
+                {
+                    Debug.WriteLine(fa[0].Trim());
+                    Debug.WriteLine(fa[1].Trim());
+                    cfg.Add(fa[0].Trim(), fa[1].Trim());
+                }
+            }
+
+
+            Set_Hotkey(cfg["hotkey"]);
+        }
+
+        private void Set_Hotkey(string keys)
+        {
+            string[] keyArray = keys.Split('+');
+
+            KeyModifier keyModifier = 0;
+            int keyHash = 0;
+
+            for (int i = 0; i < keyArray.Length; i++)
+            {
+                string key = keyArray[i].Trim().ToLower();
+
+                switch (key)
+                {
+                    case "alt":
+                        keyModifier = keyModifier | KeyModifier.Alt;
+                        break;
+                    case "ctrl":
+                        keyModifier = keyModifier | KeyModifier.Control;
+                        break;
+                    case "shift":
+                        keyModifier = keyModifier | KeyModifier.Shift;
+                        break;
+                    case "win":
+                        keyModifier = keyModifier | KeyModifier.WinKey;
+                        break;
+                    case ";":
+                        keyHash = Keys.OemSemicolon.GetHashCode();
+                        break;
+                    default:
+                        Keys tk;
+                        if (Enum.TryParse<Keys>(key, true, out tk))
+                        {
+                            keyHash = tk.GetHashCode();
+                        }
+
+                        break;
+                }
+            }
+
+            Debug.WriteLine(keyModifier.ToString());
+            Debug.WriteLine(keyHash.ToString());
+
+            UnregisterHotKey(this.Handle, hotKeyId);
+            Boolean bReg = RegisterHotKey(this.Handle, hotKeyId, (int)keyModifier, keyHash);
+
+            if (!bReg)
+            {
+                MessageBox.Show("RegisterHotKey Error, ReLoad!!!");
+            }
         }
     }
 }
