@@ -51,12 +51,7 @@ namespace igo
                 return;
             }
 
-            if (!LoadCmds())
-            {
-                MessageBox.Show("파일 읽기 오류");
-                Application.Exit();
-                return;
-            }
+            Trace.Assert(Load_iGo());
 
         }
 
@@ -82,14 +77,54 @@ namespace igo
         }
 
 
-        private bool LoadCmds()
+        bool Load_iGo()
         {
 
-            dic.Clear();
-            dic.Add("/Quit", "");
+            string[] igo_files = Directory.GetFiles(System.Environment.CurrentDirectory, "*.igo");
+            List<string> igo_list = new List<string>();
 
-            String index = System.Environment.CurrentDirectory + '\\' + "index.txt";
-            string[] lines = System.IO.File.ReadAllLines(index);
+            Boolean bigo = false;
+            Boolean bcmd = false;
+            foreach (string igo_file in igo_files)
+            {
+                Debug.WriteLine(igo_file);
+
+                if (igo_file.EndsWith("igo.igo"))
+                {
+                    bigo = true;
+                    continue;
+                }
+
+                if (igo_file.EndsWith("igo_cmd.igo"))
+                {
+                    bcmd = true;
+                    igo_list.Add(igo_file);
+                    continue;
+                }
+
+                igo_list.Add(igo_file);
+            }
+
+            Trace.Assert(bigo, "igo.igo file not found");
+            Trace.Assert(bcmd, "igo_cmd.igo file not found");
+
+            dic.Clear();
+            //dic.Add("/Quit", "");
+            //dic.Add("/ReLoad", "");
+
+            foreach(string file_path in igo_list) {
+                Load_iGo_Cmd(ref dic, file_path);
+            }
+
+
+            return true;
+        }
+
+        bool Load_iGo_Cmd(ref Dictionary<string, string> dic, string file_path)
+        {
+            // TODO: 읽지 못하는 파일 예외 처리
+
+            string[] lines = System.IO.File.ReadAllLines(file_path);
 
             for (int i = 0; i < lines.Length; i++)
             {
@@ -110,7 +145,7 @@ namespace igo
                     }
                     catch
                     {
-                        // dic.Add(fa[0]) 중복된 키가 들어갔을 때 예외 처리
+                        // TODO: dic.Add(fa[0]) 중복된 키가 들어갔을 때 예외 처리
                     }
 
                 }
@@ -282,6 +317,9 @@ namespace igo
                     case "/Quit":
                         Close();
                         break;
+                    case "/ReLoad":
+                        reload();
+                        break;
                 }
             }
             else
@@ -306,5 +344,15 @@ namespace igo
 
         }
 
+        private void notifyIcon1_Click(object sender, EventArgs e)
+        {
+            this.Visible = !this.Visible;
+        }
+
+        Boolean reload()
+        {
+
+            return true;
+        }
     }
 }
