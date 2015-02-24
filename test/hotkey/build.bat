@@ -1,0 +1,1 @@
+csc /target:winexe hotkey.cs

@@ -1,0 +1,23 @@
+﻿<Window x:Name="Main" x:Class="djRun.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525" 
+        WindowStyle="None" WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize"
+        KeyUp="Main_KeyUp" Topmost="True"
+        >
+    <Grid KeyUp="Main_KeyUp">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="main_text" 
+                 Background="#FF3E3E42" Foreground="White" 
+                 FontSize="30" KeyUp="Main_KeyUp" TextChanged="main_text_TextChanged"></TextBox>
+        <ListBox x:Name="main_list" Grid.Row="1" 
+                 Foreground="#FF569CBB" Background="#FF1E1E1E" 
+                 BorderBrush="#FF1E1E1E"
+                 KeyUp="Main_KeyUp"></ListBox>
+    </Grid>
+
+</Window>
