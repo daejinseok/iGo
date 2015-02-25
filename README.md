@@ -9,7 +9,9 @@ https://github.com/daejinseok/iGo/blob/master/package/iGo_v0.1.ZIP
 # 설치
  * igo.exe, igo.igo, igo_cmd.igo는 필수 파일입니다. 위 파일을 아무곳에나 복사 해놓습니다.
  * igo.igo파일을 열어 적당히 단축키를 정합니다. ( 기존에 사용하는 다른 키와 중복이 발생하면 오류나요 )
- * index_user.igo와 같이 igo파일을 하나 만들어 대충 명령어를 등록합니다.
+ * index_user.igo와 같이 igo파일을 하나 만들어 대충 명령어를 등록합니다. 
+   ( typeandrun config.ini파일과 호환이 됩니다. 단 파일 인코딩은 utf8로 변경해야 합니다. 
+     즉 한글이 있다면 utf8로 변경하고, config.ini를 config.igo로 변경해서 igo.exe와 같은 폴더에 넣으면 됩니다.)
  * 이제 igo.exe를 실행
  
 # 사용방법
