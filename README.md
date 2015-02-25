@@ -1,5 +1,5 @@
 # iGo
-TypeAndRun, Launchy와 같은 프로그램입니다. 이 프로그램의 간단한 목표는 손이 편하게 어플리케이션 및 명령을 쉽게 실행하기 위합니다.
+TypeAndRun, Launchy와 같은 프로그램입니다. 목표는 손이 편하게 어플리케이션 및 명령을 쉽게 실행하도록 도와주는 것 입니다.
 
 https://github.com/daejinseok/iGo/blob/master/package/iGo_v0.1.ZIP
 
