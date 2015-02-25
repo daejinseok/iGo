@@ -177,6 +177,13 @@ namespace igo
                 //MessageBox.Show("Hotkey has been pressed!");
                 // do something
                 this.Visible = !this.Visible;
+                if (this.Visible)
+                {
+                    this.Activate();
+                    this.textBox1.Focus();
+                    this.textBox1.SelectAll();
+                }
+                
             }
         }
 
@@ -206,6 +213,7 @@ namespace igo
                     }
                 }
                 listBox1.EndUpdate();
+                textBoxOldTextLen = len;
             }
             else
             {
@@ -266,7 +274,7 @@ namespace igo
                     listBox1.SelectedIndex++;
                 }
             }
-            else if (e.Modifiers == Keys.Alt && e.KeyCode == Keys.K)
+            else if ( (e.Modifiers == Keys.Alt && e.KeyCode == Keys.K) || (e.KeyCode == Keys.Up))
             {
                 if (listBox1.SelectedIndex > 0)
                 {
@@ -286,7 +294,8 @@ namespace igo
             StringBuilder sb = new StringBuilder();
             String al = ".*";
 
-            sb.Append(al);
+            //sb.Append(al);
+            sb.Append("^");
 
             for (int i = 0; i < textBox1.Text.Length; i++)
             {
@@ -299,6 +308,10 @@ namespace igo
 
         private bool callCmd()
         {
+            if (listBox1.Items.Count < 1)
+            {
+                return false;
+            }
 
             if (listBox1.SelectedIndex == -1)
             {
@@ -322,16 +335,30 @@ namespace igo
             }
             else
             {
-                //MessageBox.Show(dic[cmd]);
                 string[] dic_cmd = dic[cmd].Split('|');
+                string app_path = dic_cmd[0];
+
+                Regex rgx = new Regex("%\\S+?%");
+
+                foreach(Match match in rgx.Matches(app_path))
+                {
+
+                    string ev  = match.Value.Substring(1,match.Value.Length-2);
+                    string evv = Environment.GetEnvironmentVariable(ev);
+            
+                    Console.WriteLine(ev);
+                    Console.WriteLine(evv);
+
+                    app_path = app_path.Replace(match.Value, evv);
+                }
 
                 if (dic_cmd.Length == 1)
                 {
-                    System.Diagnostics.Process.Start(dic[cmd]);
+                    System.Diagnostics.Process.Start(app_path);
                 }
                 else if( dic_cmd.Length == 2 )
-                { 
-                    System.Diagnostics.Process.Start(dic_cmd[0], dic_cmd[1]);
+                {
+                    System.Diagnostics.Process.Start(app_path, dic_cmd[1]);
                 }
             }
 
@@ -345,6 +372,10 @@ namespace igo
         private void notifyIcon1_Click(object sender, EventArgs e)
         {
             this.Visible = !this.Visible;
+            if (this.Visible)
+            {
+                this.textBox1.Focus();
+            }
         }
 
         private void Load_igo_igo(string file_path)
