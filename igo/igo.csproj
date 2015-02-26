@@ -89,7 +89,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icon1.ico" />
     <Content Include="iGo.ico" />
     <None Include="Note.md" />
   </ItemGroup>

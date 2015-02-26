@@ -176,13 +176,11 @@ namespace igo
 
                 //MessageBox.Show("Hotkey has been pressed!");
                 // do something
-                this.Visible = !this.Visible;
-                if (this.Visible)
-                {
-                    this.Activate();
-                    this.textBox1.Focus();
-                    this.textBox1.SelectAll();
-                }
+                //this.Visible = !this.Visible;
+                this.Visible = true;
+                this.Activate();
+                this.textBox1.Focus();
+                this.textBox1.SelectAll();
                 
             }
         }
@@ -267,7 +265,7 @@ namespace igo
             {
                 callCmd();
             }
-            else if (e.Modifiers == Keys.Alt && e.KeyCode == Keys.J)
+            else if ( (e.Modifiers == Keys.Alt && e.KeyCode == Keys.J) )
             {
                 if (listBox1.SelectedIndex < listBox1.Items.Count - 1)
                 {
@@ -276,11 +274,16 @@ namespace igo
             }
             else if ( (e.Modifiers == Keys.Alt && e.KeyCode == Keys.K) || (e.KeyCode == Keys.Up))
             {
-                if (listBox1.SelectedIndex > 0)
+
+                if (e.Modifiers == Keys.Alt && e.KeyCode == Keys.K)
                 {
-                    listBox1.SelectedIndex--;
+                    if (listBox1.SelectedIndex > 0)
+                    {
+                        listBox1.SelectedIndex--;
+                    }
                 }
-                else
+
+                if (listBox1.SelectedIndex < 1)
                 {
                     textBox1.Focus();
                 }
@@ -352,14 +355,26 @@ namespace igo
                     app_path = app_path.Replace(match.Value, evv);
                 }
 
-                if (dic_cmd.Length == 1)
+                if (app_path.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    System.Diagnostics.Process.Start(app_path);
+                    Process.Start(app_path);
                 }
-                else if( dic_cmd.Length == 2 )
+                else
                 {
-                    System.Diagnostics.Process.Start(app_path, dic_cmd[1]);
+                    FileInfo fileInfo = new FileInfo(app_path);
+
+                    ProcessStartInfo startInfo = new ProcessStartInfo(app_path);
+                    startInfo.WorkingDirectory = fileInfo.DirectoryName;
+
+                    if (dic_cmd.Length == 2)
+                    {
+                        startInfo.Arguments = dic_cmd[1];
+                    }
+
+                    Process.Start(startInfo);
                 }
+
+
             }
 
             textBox1.Text = "";
@@ -452,6 +467,11 @@ namespace igo
             {
                 MessageBox.Show("RegisterHotKey Error, ReLoad!!!");
             }
+        }
+
+        private void FormIGo_Deactivate(object sender, EventArgs e)
+        {
+            this.Visible = false;
         }
     }
 }

@@ -65,7 +65,7 @@
             this.listBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(37)))));
             this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox1.Font = new System.Drawing.Font("맑은 고딕", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.listBox1.Font = new System.Drawing.Font("Malgun Gothic", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBox1.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 23;
@@ -85,10 +85,10 @@
             this.linkLabel1.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.linkLabel1.Location = new System.Drawing.Point(661, 261);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(121, 13);
+            this.linkLabel1.Size = new System.Drawing.Size(115, 13);
             this.linkLabel1.TabIndex = 2;
             this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "iGo maked by Daejin";
+            this.linkLabel1.Text = "iGo made by Daejin";
             // 
             // notifyIcon1
             // 
@@ -123,6 +123,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "iGo";
             this.TopMost = true;
+            this.Deactivate += new System.EventHandler(this.FormIGo_Deactivate);
             this.ResumeLayout(false);
             this.PerformLayout();
 

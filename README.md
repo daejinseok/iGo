@@ -23,6 +23,3 @@ https://github.com/daejinseok/iGo/blob/master/package/iGo_v0.1.ZIP
 # 시스템 명령
  * /Quit : 프로그램 종료
  * /ReLoad : 설정파일 및 igo파일을 변경되었을 때 입력하면 갱신됨.
- 
- 
-
