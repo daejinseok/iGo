@@ -60,9 +60,6 @@
     <Compile Include="FIGo.Designer.cs">
       <DependentUpon>FIGo.cs</DependentUpon>
     </Compile>
-    <Compile Include="ListBoxNoScr.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FIGo.resx">

@@ -5,17 +5,6 @@ https://github.com/daejinseok/iGo/blob/master/package/
 
 # 이력
 
-## v0.3
-2015.02.27
-* 텍스트 에디터에서 엔터칠 때 띵소리 제거
-* 핫키와, 트레이아이콘을 눌렀을 때 동일하게
-* 문자입력시 리스트박스에 채우는 부분 소스정리
-* alt j,k -> space, shfit+space로 변경
-* space,shfit+space와 위아래 커서키 둘이 동일하게 변경
-* 한글입력이면 바탕색 변경
-* 리스트 박스 스크롤 제거
-* 우측 하단 장난질.
-
 ## v0.2
 2015.02.26
 * 수정 핫키를 누르면 무조건 나오코 포커스가 가도록 수정
@@ -29,7 +18,10 @@ https://github.com/daejinseok/iGo/blob/master/package/
 
 
 ## Todo
-
+* 리스트 박스 스크롤 제거
+* 띵 소리남
+* 한ㄱ르은 흰바탕의 궁서체
+* alt j, k 변경, 등등 커서 동기화
 * 입력시 특수 문자 처리 ( ++ )
 * 명령 수정, 삭제, 우선순위 조정하도록 개선
 * 링크 기부로 만들기
@@ -53,7 +45,7 @@ https://github.com/daejinseok/iGo/blob/master/package/
  * 단축키를 누르면 프로그램 화면이 나타남
  * 명령어 철자를 하나 정도 누르면 등록한 명령어들이 목록에 나타남
  * 엔터를 바로 치면 바로 밑에 있는 명령이 실행
- * space, shfit+space로 아래, 위 동작
+ * alt+j, k로 아래, 위 동작
  
 # 시스템 명령
  * /Quit : 프로그램 종료
