@@ -38,11 +38,7 @@ https://github.com/daejinseok/iGo/blob/master/package/
 
 
 ## Todo
-<<<<<<< HEAD
 * 폴더 및 url실행시 띵~ 개선
-=======
-
->>>>>>> parent of 68fbea6... 0.4
 * 입력시 특수 문자 처리 ( ++ )
 * 명령 수정, 삭제, 우선순위 조정하도록 개선
 * 링크 기부로 만들기
