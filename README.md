@@ -43,6 +43,7 @@ https://github.com/daejinseok/iGo/blob/master/package/
 
 
 ## Todo
+
 * 폴더 및 url실행시 띵~ 개선
 * 입력시 특수 문자 처리 ( ++ )
 * 명령 수정, 삭제, 우선순위 조정하도록 개선
@@ -56,9 +57,10 @@ https://github.com/daejinseok/iGo/blob/master/package/
 .net framewrok 4.0이상이 잘 동작하는 곳은 거이다 잘 동작될 것이라 생각됩니다. ( https://msdn.microsoft.com/en-us/library/8z6watww(v=vs.100).aspx )
 
 # 설치
- * igo.exe, igo.igo, igo_cmd.igo는 필수 파일입니다. 위 파일을 아무곳에나 복사 해놓습니다.
- * igo.igo파일을 열어 적당히 단축키를 정합니다. ( 기존에 사용하는 다른 키와 중복이 발생하면 오류나요 )
- * index_user.igo와 같이 igo파일을 하나 만들어 대충 명령어를 등록합니다. 
+ * igo.exe, igo.settings, igo.cmds, user.cmds는 필수 파일입니다. 위 파일을 아무곳에나 복사 해놓습니다.
+ * igo.settings파일을 열어 적당히 단축키를 정합니다. ( 기존에 사용하는 다른 키와 중복이 발생하면 오류나요 )
+ * igo.cmds는 igo에서 사용할 내부명령을 정의할 파일입니다.
+  * user.cmds는 사용자 명령을 정의할 파일입니다.
    ( typeandrun config.ini파일과 호환이 됩니다. 단 파일 인코딩은 utf8로 변경해야 합니다. 
      즉 한글이 있다면 utf8로 변경하고, config.ini를 config.igo로 변경해서 igo.exe와 같은 폴더에 넣으면 됩니다.)
  * 이제 igo.exe를 실행
@@ -69,6 +71,6 @@ https://github.com/daejinseok/iGo/blob/master/package/
  * 엔터를 바로 치면 바로 밑에 있는 명령이 실행
  * space, shfit+space로 아래, 위 동작
  
-# 시스템 명령
+# 시스템 명령 ( igo.cmds )
  * /Quit : 프로그램 종료
  * /ReLoad : 설정파일 및 igo파일을 변경되었을 때 입력하면 갱신됨.
