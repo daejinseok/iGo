@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Drawing;
 
 
 [assembly: CLSCompliant(true)]
@@ -186,11 +186,6 @@ namespace Igo
                         e.SuppressKeyPress = true;
                         callCmd();
                         break;
-                    case Keys.Up:
-                        e.SuppressKeyPress = true;
-                        textCmd.SelectAll();
-                        textCmd.Focus();
-                        break;
                     case Keys.Insert:
                         e.SuppressKeyPress = true;
                         Call_CmdEditor(false);
@@ -288,7 +283,7 @@ namespace Igo
             string cmd = GetCmd();
 
             if (String.IsNullOrEmpty(cmd)) {
-                textCmd.Text = "Cmd is Empty";
+                lbCmdDesc.Text = "iGo will become that Typing is Happy!";
                 return false;
             }
 
@@ -322,14 +317,14 @@ namespace Igo
             string cmd = GetCmd();
 
             if (String.IsNullOrEmpty(cmd)) {
-                textCmd.Text = "Cmd is Empty";
+                lbCmdDesc.Text = "iGo will become that Typing is Happy!";
                 return;
             }
 
             if (cmd.Substring(0, 1) == "/") {
-                textCmd.Text = "IGO Cmd";
+                lbCmdDesc.Text = "Cmd of IGO";
             } else {
-                textCmd.Text = dic[cmd];
+                lbCmdDesc.Text = dic[cmd].Replace('|', ' ');
             }
         }
 
@@ -449,7 +444,7 @@ namespace Igo
             switch (e.KeyCode) {
                 case Keys.Enter:
                     e.SuppressKeyPress = true;
-                    Helper.Exec(textCmd.Text);
+                    Helper.Exec(lbCmdDesc.Text);
                     this.Hide();
                     break;
                 case Keys.Escape:
@@ -492,24 +487,20 @@ namespace Igo
         {
             // Create a new pen.
             //Pen skyBluePen = new Pen(Brushes.DeepSkyBlue);
-            Pen skyBluePen = new Pen(Brushes.LightGray);
+            Pen pen = new Pen(Brushes.LightGray);
 
             // Set the pen's width.
-            skyBluePen.Width = 0.1F;
+            pen.Width = 0.1F;
 
             // Set the LineJoin property.
-            skyBluePen.LineJoin = System.Drawing.Drawing2D.LineJoin.Bevel;
+            pen.LineJoin = System.Drawing.Drawing2D.LineJoin.Bevel;
 
             // Draw a rectangle.
-            e.Graphics.DrawRectangle(skyBluePen,
+            e.Graphics.DrawRectangle(pen,
                 new Rectangle(0, 0, this.Size.Width-1, this.Size.Height-1));
 
-            // Draw a rectangle.
-            //e.Graphics.DrawRectangle(skyBluePen,
-            //    new Rectangle(0, 0, 800, 1));
-
             //Dispose of the pen.
-            skyBluePen.Dispose();
+            pen.Dispose();
         }
 
     }

@@ -39,7 +39,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.textCmd = new System.Windows.Forms.TextBox();
+            this.lbCmdDesc = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.listBox1 = new Igo.ListBoxNoScr();
             this.SuspendLayout();
@@ -93,23 +93,19 @@
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.Click += new System.EventHandler(this.notifyIcon1_Click);
             // 
-            // textCmd
+            // lbCmdDesc
             // 
-            this.textCmd.AcceptsTab = true;
-            this.textCmd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.lbCmdDesc.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textCmd.BackColor = System.Drawing.Color.White;
-            this.textCmd.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textCmd.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textCmd.ForeColor = System.Drawing.Color.DimGray;
-            this.textCmd.ImeMode = System.Windows.Forms.ImeMode.Alpha;
-            this.textCmd.Location = new System.Drawing.Point(10, 50);
-            this.textCmd.Name = "textCmd";
-            this.textCmd.Size = new System.Drawing.Size(785, 14);
-            this.textCmd.TabIndex = 3;
-            this.textCmd.Text = "cmd desc";
-            this.textCmd.WordWrap = false;
-            this.textCmd.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textCmd_KeyDown);
+            this.lbCmdDesc.BackColor = System.Drawing.Color.White;
+            this.lbCmdDesc.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbCmdDesc.ForeColor = System.Drawing.Color.DimGray;
+            this.lbCmdDesc.Location = new System.Drawing.Point(10, 50);
+            this.lbCmdDesc.Name = "lbCmdDesc";
+            this.lbCmdDesc.Size = new System.Drawing.Size(785, 14);
+            this.lbCmdDesc.TabIndex = 3;
+            this.lbCmdDesc.Text = "iGo will become that Typing is Happy!";
+            this.lbCmdDesc.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textCmd_KeyDown);
             // 
             // label1
             // 
@@ -148,7 +144,7 @@
             this.ClientSize = new System.Drawing.Size(800, 300);
             this.ControlBox = false;
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textCmd);
+            this.Controls.Add(this.lbCmdDesc);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.textBox1);
@@ -173,12 +169,10 @@
 
         #endregion
 
-        //private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox1;
-        //private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
-        private System.Windows.Forms.TextBox textCmd;
+        private System.Windows.Forms.Label lbCmdDesc;
         private System.Windows.Forms.Label label1;
         private ListBoxNoScr listBox1;        
     }

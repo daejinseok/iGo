@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.IO;
 
 namespace Igo
 {
@@ -47,6 +48,15 @@ namespace Igo
             textPath.SelectAll();
             textPath.Focus();
 
+        }
+
+        protected override CreateParams CreateParams {
+            get {
+                const int CS_DROPSHADOW = 0x20000;
+                CreateParams cp = base.CreateParams;
+                cp.ClassStyle |= CS_DROPSHADOW;
+                return cp;
+            }
         }
 
         private void textPath_TextChanged(object sender, EventArgs e) {
@@ -229,6 +239,25 @@ namespace Igo
 
             this.DialogResult = DialogResult.OK;
             this.Close();
+        }
+
+        private void FCmdEditor_Paint(object sender, PaintEventArgs e) {
+            // Create a new pen.
+            //Pen skyBluePen = new Pen(Brushes.DeepSkyBlue);
+            Pen pen = new Pen(Brushes.LightGray);
+
+            // Set the pen's width.
+            pen.Width = 0.1F;
+
+            // Set the LineJoin property.
+            pen.LineJoin = System.Drawing.Drawing2D.LineJoin.Bevel;
+
+            // Draw a rectangle.
+            e.Graphics.DrawRectangle(pen,
+                new Rectangle(0, 0, this.Size.Width - 1, this.Size.Height - 1));
+
+            //Dispose of the pen.
+            pen.Dispose();
         }
     }
 }

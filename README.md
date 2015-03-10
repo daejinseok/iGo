@@ -4,6 +4,12 @@ TypeAndRun, Launchy와 같은 프로그램입니다. 목표는 손이 편하게 
 https://github.com/daejinseok/iGo/blob/master/package/
 
 # 이력
+## v0.6
+2015.03.10
+* 아이콘 변경
+* 명령수정창 외곽 표시
+* 명령표시창을 에디터에서 라벨로 변경
+
 ## v0.5
 2015.03.10
 * 설정 파일 변경 igo.settings, igo.cmds, user.cmds
@@ -43,7 +49,10 @@ https://github.com/daejinseok/iGo/blob/master/package/
 
 
 ## Todo
-
+* 명령어 편집창 드래그 및 topmost등등...되게 하기.
+* 명령어 편집창에 프로세스 목록 나오기.
+* 시스템 명령어 인덱스 ( System alias)
+* 중복 프로세스 막기
 * 폴더 및 url실행시 띵~ 개선
 * 입력시 특수 문자 처리 ( ++ )
 * 명령 수정, 삭제, 우선순위 조정하도록 개선

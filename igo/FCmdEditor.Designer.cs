@@ -156,7 +156,7 @@
             this.lbLineCmd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this.lbLineCmd.Location = new System.Drawing.Point(64, 200);
             this.lbLineCmd.Name = "lbLineCmd";
-            this.lbLineCmd.Size = new System.Drawing.Size(715, 2);
+            this.lbLineCmd.Size = new System.Drawing.Size(731, 2);
             this.lbLineCmd.TabIndex = 12;
             this.lbLineCmd.Text = "label5";
             // 
@@ -206,6 +206,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Cmd Editor";
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.FCmdEditor_Paint);
             this.ResumeLayout(false);
             this.PerformLayout();
 
