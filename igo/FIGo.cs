@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Drawing;
 
 
-namespace igo
+[assembly: CLSCompliant(true)]
+namespace Igo
 {
     public partial class FormIGo : Form
     {
@@ -17,9 +19,9 @@ namespace igo
 
         int hotKeyId = 0;
 
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         enum KeyModifier
@@ -35,104 +37,94 @@ namespace igo
         public FormIGo()
         {
             InitializeComponent();
-            SetConfigFileWatcher();
+            Trace.Assert(LoadSetting());
+            dic.Clear();
+            Trace.Assert(LoadCmd(ref dic, "igo"));
+            Trace.Assert(LoadCmd(ref dic, "user"));
 
-            Debug.WriteLine("FormIGo");
-
-            //if (!Register_HotKey())
-            //{
-            //    MessageBox.Show("HotKey 등록 오류");
-            //    Application.Exit();
-            //    return;
-            //}
-
-            Trace.Assert(Load_iGos());
-
+            //progressBar1.
         }
 
-        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        void SetConfigFileWatcher()
+        protected override CreateParams CreateParams
         {
-            FileSystemWatcher watcher = new FileSystemWatcher();
-            watcher.Path = System.Environment.CurrentDirectory;
-            Debug.WriteLine(watcher.Path);
-            watcher.Filter = "*.ini";
-            //watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-            //| NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
-            watcher.Changed += new FileSystemEventHandler(OnChangedWatcher);
-            watcher.EnableRaisingEvents = true;
+            get
+            {
+                const int CS_DROPSHADOW = 0x20000;
+                CreateParams cp = base.CreateParams;
+                cp.ClassStyle |= CS_DROPSHADOW;
+                return cp;
+            }
         }
 
-        private static void OnChangedWatcher(object source, FileSystemEventArgs e)
+        private bool LoadSetting()
         {
-            // Specify what is done when a file is changed, created, or deleted.
-            Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
-            //Debug.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+            string filePath = System.Environment.CurrentDirectory + "\\igo.settings";
+            FileInfo fi = new FileInfo(filePath);
+
+            if (!fi.Exists) {
+                MessageBox.Show(filePath + "파일이 존재하지 않습니다.");
+                return false;
+            }
+
+            cfg.Clear();
+            string[] lines = System.IO.File.ReadAllLines(filePath);
+
+            for (int i = 0; i < lines.Length; i++) {
+                if (lines[i][0] == ';' | lines[i][0] == '#') {
+                    continue;
+                }
+                string[] fa = lines[i].Split('=');
+
+                if (fa.Length > 1) {
+                    Debug.WriteLine(fa[0].Trim());
+                    Debug.WriteLine(fa[1].Trim());
+                    cfg.Add(fa[0].Trim(), fa[1].Trim());
+                }
+            }
+
+            Set_Hotkey(cfg["hotkey"]);
+            return true;
         }
 
-
-        bool Load_iGos()
+        bool LoadCmd(ref Dictionary<string, string> dic, string cmdName)
         {
+            string filePath = System.Environment.CurrentDirectory + "\\" + cmdName + ".cmds";
+            FileInfo fi = new FileInfo(filePath);
 
-            string[] igo_files = Directory.GetFiles(System.Environment.CurrentDirectory, "*.igo");
-            List<string> igo_list = new List<string>();
+            if (!fi.Exists) {
+                MessageBox.Show(filePath + "파일이 존재하지 않습니다.");
+                return false;
+            }
 
-            string igo_igo = "";
-            Boolean bcmd = false;
-            foreach (string igo_file in igo_files) {
-                Debug.WriteLine(igo_file);
+            string[] lines = System.IO.File.ReadAllLines(filePath);
 
-                if (igo_file.EndsWith("igo.igo")) {
-                    igo_igo = igo_file;
+            for (int i = 0; i < lines.Length; i++) {
+
+                if (lines[i][0] == ';' | lines[i][0] == '#') {
                     continue;
                 }
 
-                if (igo_file.EndsWith("igo_cmd.igo")) {
-                    bcmd = true;
+                string[] fa = lines[i].Split('|');
+
+                if (fa.Length > 1) {
+                    string key = fa[0];
+                    string val = lines[i].Substring(key.Length + 1);
+
+                    CmdAdd(key, val);
                 }
-
-                igo_list.Add(igo_file);
-            }
-
-            Trace.Assert(igo_igo.Length > 0, "igo.igo file not found");
-            Trace.Assert(bcmd, "igo_cmd.igo file not found");
-
-            Load_igo_igo(igo_igo);
-
-            dic.Clear();
-            foreach (string file_path in igo_list) {
-                Load_iGo_Cmd(ref dic, file_path);
             }
 
             return true;
         }
 
-        bool Load_iGo_Cmd(ref Dictionary<string, string> dic, string file_path)
+        private void CmdAdd(string k, string v)
         {
-            // TODO: 읽지 못하는 파일 예외 처리
 
-            string[] lines = System.IO.File.ReadAllLines(file_path);
-
-            for (int i = 0; i < lines.Length; i++) {
-                string[] fa = lines[i].Split('|');
-
-                if (fa.Length > 1) {
-                    try {
-                        if (fa.Length == 2) {
-                            dic.Add(fa[0], fa[1]);
-                        } else if (fa.Length > 2) {
-                            dic.Add(fa[0], fa[1] + '|' + fa[2]);
-                        }
-                    } catch {
-                        Debug.WriteLine("키 중복");
-                        // TODO: dic.Add(fa[0]) 중복된 키가 들어갔을 때 예외 처리
-                    }
-
-                }
+            if (dic.ContainsKey(k)) {
+                CmdAdd(k + "_igo", v);
+            } else {
+                dic.Add(k, v);
             }
-
-            return true;
         }
 
         private bool Register_HotKey()
@@ -177,72 +169,101 @@ namespace igo
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode) {
-                case Keys.Escape:
-                    e.SuppressKeyPress = true;
-                    Hide();
-                    break;
-                case Keys.Enter:
-                    e.SuppressKeyPress = true;
-                    callCmd();
-                    break;
-                case Keys.Up:
-                    e.SuppressKeyPress = true;
-                    textCmd.SelectAll();
-                    textCmd.Focus();
-                    break;                    
-                case Keys.Space:
-                case Keys.Down:
-                    e.SuppressKeyPress = true;
-                    if (listBox1.Items.Count > 0) {
-                        if (listBox1.SelectedIndex == -1) {
-                            listBox1.SelectedIndex = 0;
+            if (e.Modifiers == Keys.Control) {
+                switch (e.KeyCode) {
+                    case Keys.Insert:
+                        e.SuppressKeyPress = true;
+                        Call_CmdEditor(true);
+                        break;
+                }
+            } else {
+                switch (e.KeyCode) {
+                    case Keys.Escape:
+                        e.SuppressKeyPress = true;
+                        Hide();
+                        break;
+                    case Keys.Enter:
+                        e.SuppressKeyPress = true;
+                        callCmd();
+                        break;
+                    case Keys.Up:
+                        e.SuppressKeyPress = true;
+                        textCmd.SelectAll();
+                        textCmd.Focus();
+                        break;
+                    case Keys.Insert:
+                        e.SuppressKeyPress = true;
+                        Call_CmdEditor(false);
+                        break;
+                    case Keys.Space:
+                    case Keys.Down:
+                        e.SuppressKeyPress = true;
+                        if (listBox1.Items.Count > 0) {
+                            if (listBox1.SelectedIndex == -1) {
+                                listBox1.SelectedIndex = 0;
+                            }
+                            listBox1.Focus();
                         }
-                        listBox1.Focus();
-                    }
-                    break;
+                        break;
+                }
             }
         }
 
         private void listBox1_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode) {
-                case Keys.Escape:
-                    e.SuppressKeyPress = true;
-                    Hide();
-                    break;
-                case Keys.Enter:
-                    e.SuppressKeyPress = true;
-                    callCmd();
-                    break;
-                case Keys.Space:
+            if (e.Modifiers == Keys.Control) {
+                switch (e.KeyCode) {
+                    case Keys.Insert:
+                        e.SuppressKeyPress = true;
+                        Call_CmdEditor(true);
+                        break;
+                }
+            } else {
+                switch (e.KeyCode) {
+                    case Keys.Escape:
+                        e.SuppressKeyPress = true;
+                        Hide();
+                        break;
+                    case Keys.Enter:
+                        e.SuppressKeyPress = true;
+                        callCmd();
+                        break;
+                    case Keys.Insert:
+                        e.SuppressKeyPress = true;
+                        Call_CmdEditor(false);
+                        break;
+                    case Keys.Space:
 
-                    int idx = listBox1.SelectedIndex;
-                    int cnt = listBox1.Items.Count;
+                        int idx = listBox1.SelectedIndex;
+                        int cnt = listBox1.Items.Count;
 
-                    if (e.Modifiers == Keys.Shift) {
-                        if (idx > -1) {
-                            listBox1.SelectedIndex--;
+                        if (e.Modifiers == Keys.Shift) {
+                            if (idx > -1) {
+                                listBox1.SelectedIndex--;
+                            }
+
+                            if (listBox1.SelectedIndex == -1) {
+                                textBox1.Focus();
+                                e.SuppressKeyPress = true;
+                            }
+                        } else {
+                            if (idx < (cnt - 1)) {
+                                listBox1.SelectedIndex++;
+                            }
                         }
-
-                        if (listBox1.SelectedIndex == -1) {
+                        break;
+                    case Keys.Up:
+                        if (listBox1.SelectedIndex == 0) {
+                            listBox1.SelectedIndex = -1;
                             textBox1.Focus();
                             e.SuppressKeyPress = true;
                         }
-                    } else {
-                        if (idx < (cnt - 1)) {
-                            listBox1.SelectedIndex++;
-                        }
-                    }
-                    break;
-                case Keys.Up:
-                    if (listBox1.SelectedIndex == 0) {
-                        listBox1.SelectedIndex = -1;
-                        textBox1.Focus();
-                        e.SuppressKeyPress = true;
-                    }
-                    break;
+                        break;
+                }
             }
+
+
+
 
         }
 
@@ -264,35 +285,25 @@ namespace igo
 
         private bool callCmd()
         {
-            if (listBox1.Items.Count < 1) {
+            string cmd = GetCmd();
+
+            if (String.IsNullOrEmpty(cmd)) {
+                textCmd.Text = "Cmd is Empty";
                 return false;
             }
-
-            if (listBox1.SelectedIndex == -1) {
-                listBox1.SelectedIndex = 0;
-            }
-
-            string cmd;
-            if (listBox1.SelectedIndex == -1) {
-                cmd = listBox1.Items[0].ToString();
-            } else {
-                cmd = listBox1.SelectedItem.ToString();
-            }
-
-            if (cmd.Trim() == ""){
-                return false;
-            }
-
 
             if (cmd.Substring(0, 1) == "/") {
 
-                switch (cmd) 
-                {
+                switch (cmd) {
                     case "/Quit":
+                    case "/Exit":
                         Close();
                         break;
                     case "/ReLoad":
-                        Trace.Assert(Load_iGos());
+                        Trace.Assert(LoadSetting());
+                        dic.Clear();
+                        Trace.Assert(LoadCmd(ref dic, "igo"));
+                        Trace.Assert(LoadCmd(ref dic, "user"));
                         break;
                 }
 
@@ -306,61 +317,41 @@ namespace igo
             return true;
         }
 
-        private void displayCmd()
+        void displayCmd()
         {
-            if (listBox1.Items.Count < 1)
-            {
-                textCmd.Text = "Not Search Cmd";
-                return;
-            }
+            string cmd = GetCmd();
 
-            string cmd;
-            if (listBox1.SelectedIndex == -1){
-                cmd = listBox1.Items[0].ToString();
-            }else{
-                cmd = listBox1.SelectedItem.ToString();
-            }            
-
-           if (cmd.Trim() == "") {
+            if (String.IsNullOrEmpty(cmd)) {
                 textCmd.Text = "Cmd is Empty";
                 return;
             }
 
-           if (cmd.Substring(0, 1) == "/")
-            {
+            if (cmd.Substring(0, 1) == "/") {
                 textCmd.Text = "IGO Cmd";
-                return;
             } else {
-                textCmd.Text = dic[cmd].Replace('|', ' ');
-                return;
+                textCmd.Text = dic[cmd];
             }
+        }
+
+        string GetCmd()
+        {
+            if (listBox1.Items.Count < 1) {
+                return "";
+            }
+
+            string cmd;
+            if (listBox1.SelectedIndex == -1) {
+                cmd = listBox1.Items[0].ToString();
+            } else {
+                cmd = listBox1.SelectedItem.ToString();
+            }
+
+            return cmd;
         }
 
         private void notifyIcon1_Click(object sender, EventArgs e)
         {
             this.ActiveShow();
-        }
-
-        private void Load_igo_igo(string file_path)
-        {
-            cfg.Clear();
-            string[] lines = System.IO.File.ReadAllLines(file_path);
-
-            for (int i = 0; i < lines.Length; i++) {
-                if (lines[i][0] == ';' | lines[i][0] == '#') {
-                    continue;
-                }
-                string[] fa = lines[i].Split('=');
-
-                if (fa.Length > 1) {
-                    Debug.WriteLine(fa[0].Trim());
-                    Debug.WriteLine(fa[1].Trim());
-                    cfg.Add(fa[0].Trim(), fa[1].Trim());
-                }
-            }
-
-
-            Set_Hotkey(cfg["hotkey"]);
         }
 
         private void Set_Hotkey(string keys)
@@ -417,11 +408,11 @@ namespace igo
 
         private void ActiveShow()
         {
-            if (textBox1.ImeMode == ImeMode.Alpha) {
-                textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(26)))));
-            } else {
-                textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(80)))));
-            }
+            //if (textBox1.ImeMode == ImeMode.Alpha) {
+            //    textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(26)))));
+            //} else {
+            //    textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(80)))));
+            //}
 
             this.Visible = true;
             this.Activate();
@@ -431,21 +422,21 @@ namespace igo
 
         private void textBox1_ImeModeChanged(object sender, EventArgs e)
         {
-            if (textBox1.ImeMode == ImeMode.Alpha) {
-                textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(26)))));
-            } else {
-                textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(26)))), ((int)(((byte)(80)))));
-            }
+            //if (textBox1.ImeMode == ImeMode.Alpha) {
+            //    textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(26)))));
+            //} else {
+            //    textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(26)))), ((int)(((byte)(80)))));
+            //}
         }
 
         private void linkLabel1_MouseHover(object sender, EventArgs e)
         {
-            linkLabel1.Text = "Daejin *_*";
+            //linkLabel1.Text = "Daejin *_*";
         }
 
         private void linkLabel1_MouseLeave(object sender, EventArgs e)
         {
-            linkLabel1.Text = "Daejin =_=";
+            //linkLabel1.Text = "Daejin =_=";
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -461,7 +452,65 @@ namespace igo
                     Helper.Exec(textCmd.Text);
                     this.Hide();
                     break;
+                case Keys.Escape:
+                    e.SuppressKeyPress = true;
+                    Hide();
+                    break;
             }
         }
+
+        void Call_CmdEditor(bool bEdit)
+        {
+            string cmd = "";
+
+            if (bEdit) {
+                cmd = GetCmd();
+            }
+
+            FCmdEditor fc;
+            if (String.IsNullOrEmpty(cmd)) {
+                fc = new FCmdEditor(dic);
+            } else {
+                fc = new FCmdEditor(dic, cmd, dic[cmd]);
+            }
+
+            fc.ShowDialog(this);
+            if (fc.DialogResult == DialogResult.OK) {
+                dic.Clear();
+                Trace.Assert(LoadCmd(ref dic, "igo"));
+                Trace.Assert(LoadCmd(ref dic, "user"));
+            }
+            textBox1.Text = fc.cmd;
+
+            fc.Dispose();
+
+            this.ActiveShow();
+            return;
+        }
+
+        private void FormIGo_Paint(object sender, PaintEventArgs e)
+        {
+            // Create a new pen.
+            //Pen skyBluePen = new Pen(Brushes.DeepSkyBlue);
+            Pen skyBluePen = new Pen(Brushes.LightGray);
+
+            // Set the pen's width.
+            skyBluePen.Width = 0.1F;
+
+            // Set the LineJoin property.
+            skyBluePen.LineJoin = System.Drawing.Drawing2D.LineJoin.Bevel;
+
+            // Draw a rectangle.
+            e.Graphics.DrawRectangle(skyBluePen,
+                new Rectangle(0, 0, this.Size.Width-1, this.Size.Height-1));
+
+            // Draw a rectangle.
+            //e.Graphics.DrawRectangle(skyBluePen,
+            //    new Rectangle(0, 0, 800, 1));
+
+            //Dispose of the pen.
+            skyBluePen.Dispose();
+        }
+
     }
 }

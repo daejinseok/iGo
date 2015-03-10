@@ -4,6 +4,11 @@ TypeAndRun, Launchy와 같은 프로그램입니다. 목표는 손이 편하게 
 https://github.com/daejinseok/iGo/blob/master/package/
 
 # 이력
+## v0.5
+2015.03.10
+* 설정 파일 변경 igo.settings, igo.cmds, user.cmds
+* 명령 추가, 편집 창 추가
+* 흰색으로 스타일 변경
 
 ## v0.4
 2015.03.06

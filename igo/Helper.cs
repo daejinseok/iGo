@@ -1,65 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
-
-namespace igo
+namespace Igo
 {
     class Helper
     {
         public static void Exec(string cmd)
         {
-            string[] cmdArr = cmd.Split('|');
-            string appPath = cmdArr[0];
+            try {
+                string[] cmdArr = cmd.Split('|');
+                string appPath = cmdArr[0];
 
-            if (appPath.StartsWith("\"") && appPath.EndsWith("\"")) {
-                appPath = appPath.Substring(1, appPath.Length - 2);
-            }
+                if (appPath.StartsWith("\"") && appPath.EndsWith("\"")) {
+                    appPath = appPath.Substring(1, appPath.Length - 2);
+                }
 
-            //if (appPath.StartsWith("http", StringComparison.CurrentCultureIgnoreCase)) {
-            //    //return ( (Process.Start(appPath)).ExitCode == 0);
-            //    Process.Start(appPath);
-            //    return;
-            //}
+                appPath = replaceEnv(appPath);
 
-            appPath = replaceEnv(appPath);
-            FileInfo fileInfo = new FileInfo(appPath);
+                if (appPath.StartsWith("http", StringComparison.CurrentCultureIgnoreCase)) {
+                    Process.Start(appPath);
+                    return;
+                }
 
-            if (fileInfo.Exists) {
+                Debug.WriteLine(appPath);
+
+                FileInfo fileInfo = new FileInfo(appPath);
+
                 ProcessStartInfo startInfo = new ProcessStartInfo(appPath);
                 startInfo.WorkingDirectory = fileInfo.DirectoryName;
 
-                if (cmdArr.Length == 2) {
+                if (cmdArr.Length > 1) {
                     startInfo.Arguments = replaceEnv(cmdArr[1]);
                 }
-                //return ((Process.Start(startInfo)).ExitCode == 0);
-                try {
-                    Process.Start(startInfo);
-                } catch (System.Exception e) {
-                    MessageBox.Show(e.ToString());
-                }
-            } else {
-                try {
-                    Process.Start(appPath);
-                //} catch (System.ComponentModel.Win32Exception e) {
-                //    MessageBox.Show(e.ToString());
-                //} catch (System.ObjectDisposedException e) {
+                Process.Start(startInfo);
 
-                //} catch (System.IO.FileNotFoundException e) {
-                } catch (System.Exception e){
-                    MessageBox.Show(e.ToString());
-                }
-                
             }
-
-
-            return;
-            
+            catch (System.Exception e) {
+                MessageBox.Show(e.ToString());
+            }
         }
 
         private static string replaceEnv(string fileNameEnv)
@@ -81,6 +62,18 @@ namespace igo
             fileName = fileName.Replace("${cur_dir}", System.Environment.CurrentDirectory);
 
             return fileName;
+        }
+
+        public static bool FileNotExist(string path)
+        {
+            FileInfo fi = new FileInfo(path);
+
+            if (!fi.Exists) {
+                MessageBox.Show(path + "파일이 존재하지 않습니다.");
+                return true;
+            }
+
+            return false;
         }
     }
 }
