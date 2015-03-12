@@ -41,7 +41,9 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.lbCmdDesc = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.watcher = new System.IO.FileSystemWatcher();
             this.listBox1 = new Igo.ListBoxNoScr();
+            ((System.ComponentModel.ISupportInitialize)(this.watcher)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox1
@@ -73,12 +75,12 @@
             this.linkLabel1.ForeColor = System.Drawing.Color.Gold;
             this.linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
             this.linkLabel1.LinkColor = System.Drawing.Color.Gold;
-            this.linkLabel1.Location = new System.Drawing.Point(0, 270);
+            this.linkLabel1.Location = new System.Drawing.Point(1, 270);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(800, 25);
+            this.linkLabel1.Size = new System.Drawing.Size(798, 25);
             this.linkLabel1.TabIndex = 2;
             this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "iGo v0.1";
+            this.linkLabel1.Text = "새로운 맥북 갖고 싶당!";
             this.linkLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.linkLabel1.MouseLeave += new System.EventHandler(this.linkLabel1_MouseLeave);
             this.linkLabel1.MouseHover += new System.EventHandler(this.linkLabel1_MouseHover);
@@ -104,7 +106,7 @@
             this.lbCmdDesc.Name = "lbCmdDesc";
             this.lbCmdDesc.Size = new System.Drawing.Size(785, 14);
             this.lbCmdDesc.TabIndex = 3;
-            this.lbCmdDesc.Text = "iGo will become that Typing is Happy!";
+            this.lbCmdDesc.Text = "마우스 따위 사용하지 않을 테다.";
             this.lbCmdDesc.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textCmd_KeyDown);
             // 
             // label1
@@ -116,6 +118,12 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(790, 1);
             this.label1.TabIndex = 4;
+            // 
+            // watcher
+            // 
+            this.watcher.EnableRaisingEvents = true;
+            this.watcher.SynchronizingObject = this;
+            this.watcher.Changed += new System.IO.FileSystemEventHandler(this.watcher_Changed);
             // 
             // listBox1
             // 
@@ -162,6 +170,7 @@
             this.TopMost = true;
             this.Deactivate += new System.EventHandler(this.FormIGo_Deactivate);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.FormIGo_Paint);
+            ((System.ComponentModel.ISupportInitialize)(this.watcher)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -174,7 +183,8 @@
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Label lbCmdDesc;
         private System.Windows.Forms.Label label1;
-        private ListBoxNoScr listBox1;        
+        private ListBoxNoScr listBox1;
+        private System.IO.FileSystemWatcher watcher;        
     }
 }
 

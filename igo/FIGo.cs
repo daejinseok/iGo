@@ -19,6 +19,8 @@ namespace Igo
 
         int hotKeyId = 0;
 
+        bool deactivate_isVisible = false;
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
@@ -70,6 +72,10 @@ namespace Igo
             string[] lines = System.IO.File.ReadAllLines(filePath);
 
             for (int i = 0; i < lines.Length; i++) {
+
+                if (String.IsNullOrEmpty(lines[i])) continue;
+
+
                 if (lines[i][0] == ';' | lines[i][0] == '#') {
                     continue;
                 }
@@ -82,7 +88,12 @@ namespace Igo
                 }
             }
 
-            Set_Hotkey(cfg["hotkey"]);
+            set_hotkey(cfg["hotkey"]);
+            set_theme(cfg["theme"]);
+            set_theme_watch(cfg["theme_is_watch"], cfg["theme"]);
+            set_deactivate_is_visible(cfg["deactivate_is_visible"]);
+            set_top_most(cfg["top_most"]);
+
             return true;
         }
 
@@ -283,7 +294,7 @@ namespace Igo
             string cmd = GetCmd();
 
             if (String.IsNullOrEmpty(cmd)) {
-                lbCmdDesc.Text = "iGo will become that Typing is Happy!";
+                lbCmdDesc.Text = "마우스 따위 사용하지 않을 테다.";
                 return false;
             }
 
@@ -317,7 +328,7 @@ namespace Igo
             string cmd = GetCmd();
 
             if (String.IsNullOrEmpty(cmd)) {
-                lbCmdDesc.Text = "iGo will become that Typing is Happy!";
+                lbCmdDesc.Text = "마우스 따위 사용하지 않을 테다.";
                 return;
             }
 
@@ -349,7 +360,7 @@ namespace Igo
             this.ActiveShow();
         }
 
-        private void Set_Hotkey(string keys)
+        private void set_hotkey(string keys)
         {
             string[] keyArray = keys.Split('+');
 
@@ -396,9 +407,119 @@ namespace Igo
             }
         }
 
+        void set_theme(string theme_file) {
+
+            string filePath = System.Environment.CurrentDirectory + "\\" + theme_file;
+            FileInfo fi = new FileInfo(filePath);
+
+            if (!fi.Exists) {
+                MessageBox.Show(filePath + "파일이 존재하지 않습니다.");
+                return;
+            }
+
+            try {
+                string[] lines = System.IO.File.ReadAllLines(filePath);
+
+
+                for (int i = 0; i < lines.Length; i++) {
+
+                    if (String.IsNullOrEmpty(lines[i])) {
+                        continue;
+                    }
+
+                    if (lines[i][0] == ';' | lines[i][0] == '#') {
+                        continue;
+                    }
+
+                    string[] fa = lines[i].Split('=');
+
+                    if (fa.Length > 1) {
+                        string key = fa[0].Trim();
+                        string value = fa[1].Trim();
+
+                        switch (key) {
+                            case "FormiGo.BackColor":
+                                this.BackColor = Helper.StrToColor(value);
+                                break;
+                            case "TextBox1.BackColor":
+                                textBox1.BackColor = Helper.StrToColor(value);
+                                break;
+                            case "TextBox1.ForeColor":
+                                textBox1.ForeColor = Helper.StrToColor(value);
+                                break;
+                            case "LinkLabel1.BackColor":
+                                linkLabel1.BackColor = Helper.StrToColor(value);
+                                break;
+                            case "LinkLabel1.ForeColor":
+                                linkLabel1.ForeColor = Helper.StrToColor(value);
+                                break;
+                            case "LinkLabel1.LinkColor":
+                                linkLabel1.LinkColor = Helper.StrToColor(value);
+                                break;
+                            case "LbCmdDesc.BackColor":
+                                lbCmdDesc.BackColor = Helper.StrToColor(value);
+                                break;
+                            case "LbCmdDesc.ForeColor":
+                                lbCmdDesc.ForeColor = Helper.StrToColor(value);
+                                break;
+                            case "label1.ForeColor":
+                                label1.ForeColor = Helper.StrToColor(value);
+                                break;
+                            case "label1.BackColor":
+                                label1.BackColor = Helper.StrToColor(value);
+                                break;
+                            case "listBox1.BackColor":
+                                listBox1.BackColor = Helper.StrToColor(value);
+                                break;
+                            case "listBox1.ForeColor":
+                                listBox1.ForeColor = Helper.StrToColor(value);
+                                break;
+                        }
+                    }
+                }
+
+                return;
+            } catch (Exception e) {
+                set_theme(theme_file);
+            }
+        }
+
+        void set_theme_watch(string strbool, string theme_file) {
+            if (strbool == "true") {
+
+                FileInfo f = new FileInfo(System.Environment.CurrentDirectory + "\\" + theme_file);
+                
+                watcher.Path = f.DirectoryName;
+                watcher.Filter = f.Name;
+                watcher.EnableRaisingEvents = true;
+                Debug.WriteLine("this.Deactivate 제거");
+                this.Deactivate -= new System.EventHandler(this.FormIGo_Deactivate);
+            } else {
+                watcher.EnableRaisingEvents = false;
+                Debug.WriteLine("this.Deactivate 추가");
+                this.Deactivate += new System.EventHandler(this.FormIGo_Deactivate);
+            }
+        }
+
+        void set_deactivate_is_visible(string strbool){
+            if (strbool == "true") {
+                this.deactivate_isVisible = true;
+            }else{
+                this.deactivate_isVisible = false;
+            }
+        }
+
+        void set_top_most(string strbool){
+            if (strbool == "true") {
+                this.TopMost = true;
+            } else {
+                this.TopMost = false;
+            }
+        }
+
         private void FormIGo_Deactivate(object sender, EventArgs e)
         {
-            this.Visible = false;
+            this.Visible = deactivate_isVisible;
         }
 
         private void ActiveShow()
@@ -412,7 +533,7 @@ namespace Igo
             this.Visible = true;
             this.Activate();
             this.textBox1.Focus();
-            this.textBox1.SelectAll();
+            //this.textBox1.SelectAll();
         }
 
         private void textBox1_ImeModeChanged(object sender, EventArgs e)
@@ -503,5 +624,8 @@ namespace Igo
             pen.Dispose();
         }
 
+        private void watcher_Changed(object sender, FileSystemEventArgs e) {
+            set_theme(cfg["theme"]);
+        }
     }
 }

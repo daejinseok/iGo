@@ -113,6 +113,15 @@ namespace Igo
                     case Keys.Enter:
                         CmdApply(true);
                         break;
+                    case Keys.P:
+
+                        FProcessList fp = new FProcessList();
+                        fp.ShowDialog(this);
+                        //if (fp.DialogResult == DialogResult.OK) {
+                        //}
+                        fp.Dispose();
+                        e.SuppressKeyPress = true;
+                        break;
                 }
             } else {
                 switch (e.KeyCode) {

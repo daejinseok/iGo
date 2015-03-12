@@ -4,6 +4,11 @@ TypeAndRun, Launchy와 같은 프로그램입니다. 목표는 손이 편하게 
 https://github.com/daejinseok/iGo/blob/master/package/
 
 # 이력
+## v0.7
+2015.03.13
+* 설정파일 추가
+* 메인컬러 테마
+
 ## v0.6
 2015.03.10
 * 아이콘 변경
@@ -61,6 +66,9 @@ https://github.com/daejinseok/iGo/blob/master/package/
 * 통계 -> 실행되는 정보 모아서 
 * 콘솔, 파일매니져, 브라우져 설정
 * 계산기?
+
+## Post
+
 
 # 사양
 .net framewrok 4.0이상이 잘 동작하는 곳은 거이다 잘 동작될 것이라 생각됩니다. ( https://msdn.microsoft.com/en-us/library/8z6watww(v=vs.100).aspx )

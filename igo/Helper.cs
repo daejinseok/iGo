@@ -75,5 +75,17 @@ namespace Igo
 
             return false;
         }
+
+
+        public static System.Drawing.Color StrToColor( string strColor ){
+            //this.textBox1.BackColor = System.Drawing.Color.White;
+
+            string[] rgb = strColor.Split(',');
+            int red = Convert.ToInt32(rgb[0].Trim());
+            int green = Convert.ToInt32(rgb[1].Trim());
+            int blue = Convert.ToInt32(rgb[2].Trim());
+
+            return System.Drawing.Color.FromArgb(red, green, blue);
+        }
     }
 }
