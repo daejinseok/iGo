@@ -14,12 +14,18 @@ namespace Igo
 {
     public partial class FormIGo : Form
     {
+        FCmdEditor fc;
+
         Dictionary<string, string> dic = new Dictionary<string, string>();
         Dictionary<string, string> cfg = new Dictionary<string, string>();
 
         int hotKeyId = 0;
-
         bool deactivate_isVisible = false;
+
+        Color boderColor = Color.LightGray;
+        float boderWidth = 0.1f;
+
+        string cmdDesc = "마우스 따위 사용하지 않을 테다.";
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
@@ -43,8 +49,7 @@ namespace Igo
             dic.Clear();
             Trace.Assert(LoadCmd(ref dic, "igo"));
             Trace.Assert(LoadCmd(ref dic, "user"));
-
-            //progressBar1.
+            this.ActiveShow();
         }
 
         protected override CreateParams CreateParams
@@ -74,25 +79,25 @@ namespace Igo
             for (int i = 0; i < lines.Length; i++) {
 
                 if (String.IsNullOrEmpty(lines[i])) continue;
-
-
                 if (lines[i][0] == ';' | lines[i][0] == '#') {
                     continue;
                 }
+
                 string[] fa = lines[i].Split('=');
 
                 if (fa.Length > 1) {
-                    Debug.WriteLine(fa[0].Trim());
-                    Debug.WriteLine(fa[1].Trim());
                     cfg.Add(fa[0].Trim(), fa[1].Trim());
                 }
             }
 
-            set_hotkey(cfg["hotkey"]);
-            set_theme(cfg["theme"]);
-            set_theme_watch(cfg["theme_is_watch"], cfg["theme"]);
-            set_deactivate_is_visible(cfg["deactivate_is_visible"]);
-            set_top_most(cfg["top_most"]);
+            if (cfg.ContainsKey("hotkey")) set_hotkey(cfg["hotkey"]);
+            if (cfg.ContainsKey("theme"))  {
+                set_theme(cfg["theme"]);
+                if (cfg.ContainsKey("theme_is_watch")) set_theme_watch(cfg["theme_is_watch"], cfg["theme"]);
+            }
+
+            if (cfg.ContainsKey("deactivate_is_visible")) set_deactivate_is_visible(cfg["deactivate_is_visible"]);
+            if (cfg.ContainsKey("top_most")) set_top_most(cfg["top_most"]);
 
             return true;
         }
@@ -143,15 +148,15 @@ namespace Igo
             // Register Shift + A as global hotkey.
             UnregisterHotKey(this.Handle, hotKeyId);
             return RegisterHotKey(this.Handle, hotKeyId, (int)KeyModifier.Shift, Keys.A.GetHashCode());
-            //return RegisterHotKey(this.Handle, hotKeyId, (int)KeyModifier.Alt, Keys.OemSemicolon.GetHashCode());
         }
 
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
 
-            // WM_HOTKEY = 0x0312
-            if (m.Msg == 0x0312) {
+            int WM_HOTKEY = 0x0312;
+
+            if (m.Msg == WM_HOTKEY) {
                 this.ActiveShow();
             }
         }
@@ -278,7 +283,6 @@ namespace Igo
             StringBuilder sb = new StringBuilder();
             String al = ".*";
 
-            //sb.Append(al);
             sb.Append("^");
 
             for (int i = 0; i < textBox1.Text.Length; i++) {
@@ -328,7 +332,7 @@ namespace Igo
             string cmd = GetCmd();
 
             if (String.IsNullOrEmpty(cmd)) {
-                lbCmdDesc.Text = "마우스 따위 사용하지 않을 테다.";
+                lbCmdDesc.Text = this.cmdDesc;
                 return;
             }
 
@@ -437,48 +441,12 @@ namespace Igo
                         string key = fa[0].Trim();
                         string value = fa[1].Trim();
 
-                        switch (key) {
-                            case "FormiGo.BackColor":
-                                this.BackColor = Helper.StrToColor(value);
-                                break;
-                            case "TextBox1.BackColor":
-                                textBox1.BackColor = Helper.StrToColor(value);
-                                break;
-                            case "TextBox1.ForeColor":
-                                textBox1.ForeColor = Helper.StrToColor(value);
-                                break;
-                            case "LinkLabel1.BackColor":
-                                linkLabel1.BackColor = Helper.StrToColor(value);
-                                break;
-                            case "LinkLabel1.ForeColor":
-                                linkLabel1.ForeColor = Helper.StrToColor(value);
-                                break;
-                            case "LinkLabel1.LinkColor":
-                                linkLabel1.LinkColor = Helper.StrToColor(value);
-                                break;
-                            case "LbCmdDesc.BackColor":
-                                lbCmdDesc.BackColor = Helper.StrToColor(value);
-                                break;
-                            case "LbCmdDesc.ForeColor":
-                                lbCmdDesc.ForeColor = Helper.StrToColor(value);
-                                break;
-                            case "label1.ForeColor":
-                                label1.ForeColor = Helper.StrToColor(value);
-                                break;
-                            case "label1.BackColor":
-                                label1.BackColor = Helper.StrToColor(value);
-                                break;
-                            case "listBox1.BackColor":
-                                listBox1.BackColor = Helper.StrToColor(value);
-                                break;
-                            case "listBox1.ForeColor":
-                                listBox1.ForeColor = Helper.StrToColor(value);
-                                break;
-                        }
+                        Helper.set_property(this, key, value);
                     }
                 }
 
                 return;
+            //} catch (Exception e) {
             } catch (Exception e) {
                 set_theme(theme_file);
             }
@@ -492,12 +460,8 @@ namespace Igo
                 watcher.Path = f.DirectoryName;
                 watcher.Filter = f.Name;
                 watcher.EnableRaisingEvents = true;
-                Debug.WriteLine("this.Deactivate 제거");
-                this.Deactivate -= new System.EventHandler(this.FormIGo_Deactivate);
             } else {
                 watcher.EnableRaisingEvents = false;
-                Debug.WriteLine("this.Deactivate 추가");
-                this.Deactivate += new System.EventHandler(this.FormIGo_Deactivate);
             }
         }
 
@@ -606,21 +570,14 @@ namespace Igo
 
         private void FormIGo_Paint(object sender, PaintEventArgs e)
         {
-            // Create a new pen.
-            //Pen skyBluePen = new Pen(Brushes.DeepSkyBlue);
-            Pen pen = new Pen(Brushes.LightGray);
+            Pen pen = new Pen(this.boderColor);
 
-            // Set the pen's width.
-            pen.Width = 0.1F;
-
-            // Set the LineJoin property.
+            pen.Width = this.boderWidth;
             pen.LineJoin = System.Drawing.Drawing2D.LineJoin.Bevel;
 
-            // Draw a rectangle.
             e.Graphics.DrawRectangle(pen,
                 new Rectangle(0, 0, this.Size.Width-1, this.Size.Height-1));
 
-            //Dispose of the pen.
             pen.Dispose();
         }
 

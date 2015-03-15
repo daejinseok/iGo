@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace Igo
 {
@@ -21,6 +22,11 @@ namespace Igo
                 appPath = replaceEnv(appPath);
 
                 if (appPath.StartsWith("http", StringComparison.CurrentCultureIgnoreCase)) {
+                    Process.Start(appPath);
+                    return;
+                }
+
+                if (appPath.StartsWith("\\\\")) {
                     Process.Start(appPath);
                     return;
                 }
@@ -77,15 +83,71 @@ namespace Igo
         }
 
 
-        public static System.Drawing.Color StrToColor( string strColor ){
+        public static Color strToColor( string strColor ){
             //this.textBox1.BackColor = System.Drawing.Color.White;
 
             string[] rgb = strColor.Split(',');
-            int red = Convert.ToInt32(rgb[0].Trim());
-            int green = Convert.ToInt32(rgb[1].Trim());
-            int blue = Convert.ToInt32(rgb[2].Trim());
+            if (rgb.Length == 3) {
+                int red = Convert.ToInt32(rgb[0].Trim());
+                int green = Convert.ToInt32(rgb[1].Trim());
+                int blue = Convert.ToInt32(rgb[2].Trim());
 
-            return System.Drawing.Color.FromArgb(red, green, blue);
+                return Color.FromArgb(red, green, blue);
+            } else {
+
+                // 일단 정상동작 안함. 그냥 숫자 3개 쓰자...ㅠㅠ
+                Color c;
+
+                try {
+                    if (Enum.TryParse(strColor, true, out c)) return c;
+                } finally {
+                    c = Color.Red;
+                }
+
+                return c;
+            }
+        }
+
+        public static bool strToBool(string s) {
+            return (s.ToLower() == "true");
+        }
+
+        public static void set_property(Form f, string ctrl_property, string value)
+        {
+            string[] k = ctrl_property.Split('.');
+            if (k.Length < 2) return;
+
+            string ctrl     = k[0];
+            string property = k[1];
+
+            Control c = get_control(f, ctrl);
+            if (c == null) return;
+
+            switch (property) {
+                case "BackColor":
+                    c.BackColor = Helper.strToColor(value);
+                    break;
+                case "ForeColor":
+                    c.ForeColor = Helper.strToColor(value);
+                    break;
+            }
+
+        }
+
+        public static Control get_control(Form f, string ctrl_name)
+        {
+            if ((ctrl_name == "FormiGo") || (ctrl_name == "FCmdEditor")) {
+                return f;
+            }
+
+            Control c = f.GetNextControl(f, true);
+
+            while (c != null) {
+                if (c.Name == ctrl_name) return c;
+                c = f.GetNextControl(c, true);
+            }
+
+            return null;
         }
     }
 }
