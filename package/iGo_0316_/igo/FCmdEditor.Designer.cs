@@ -115,9 +115,9 @@
             this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
             this.label1.Font = new System.Drawing.Font("Malgun Gothic", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label1.ForeColor = System.Drawing.Color.Gold;
-            this.label1.Location = new System.Drawing.Point(1, 268);
+            this.label1.Location = new System.Drawing.Point(0, 268);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(798, 25);
+            this.label1.Size = new System.Drawing.Size(800, 25);
             this.label1.TabIndex = 8;
             this.label1.Text = "Enter : 수정 혹은 추가     Ctrl+Enter : 가장 앞에 추가     ESC : 화면 종료";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;

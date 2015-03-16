@@ -115,19 +115,12 @@ namespace Igo
         public static void set_property(Form f, string ctrl_property, string value)
         {
             string[] k = ctrl_property.Split('.');
+            if (k.Length < 2) return;
 
-            string property = "";
-            Control c = null;
+            string ctrl     = k[0];
+            string property = k[1];
 
-            if (k.Length == 2) {
-                c = f;
-                property = k[1];
-            } else if (k.Length == 3) {
-                string ctrl = k[1];
-                property = k[2];
-                c = get_control(f, ctrl);
-            } else return;
-            
+            Control c = get_control(f, ctrl);
             if (c == null) return;
 
             switch (property) {
@@ -143,6 +136,10 @@ namespace Igo
 
         public static Control get_control(Form f, string ctrl_name)
         {
+            if ((ctrl_name == "FormiGo") || (ctrl_name == "FCmdEditor")) {
+                return f;
+            }
+
             Control c = f.GetNextControl(f, true);
 
             while (c != null) {

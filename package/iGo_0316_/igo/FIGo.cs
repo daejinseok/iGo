@@ -14,10 +14,12 @@ namespace Igo
 {
     public partial class FormIGo : Form
     {
-        public FCmdEditor fc = new FCmdEditor();
+
 
         Dictionary<string, string> dic = new Dictionary<string, string>();
         Dictionary<string, string> cfg = new Dictionary<string, string>();
+
+        FCmdEditor fc = new FCmdEditor();
 
         int hotKeyId = 0;
         bool deactivate_isVisible = false;
@@ -445,11 +447,7 @@ namespace Igo
                         string key = fa[0].Trim();
                         string value = fa[1].Trim();
 
-                        if (key.StartsWith("iGo.")) {
-                            Helper.set_property(this, key, value);
-                        } else {
-                            Helper.set_property(this.fc, key, value);
-                        }
+                        Helper.set_property(this, key, value);
                     }
                 }
 
